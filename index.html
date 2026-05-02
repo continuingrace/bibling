@@ -692,7 +692,7 @@ function renderList() {
         <div class="vc-ref">${escHtml(v.ref)}</div>
         <div class="vc-ver">${escHtml(v.version||'개역개정')}</div>
       </div>
-      ${v.text ? `<div class="vc-text">"${escHtml(v.text.slice(0,80))}${v.text.length>80?'…':''}"</div>` : ''}
+      ${v.text ? `<div class="vc-text">"${escHtml(v.text.slice(0,80)).replace(/\n/g,' ')}${v.text.length>80?'…':''}"</div>` : ''}
       ${tags ? `<div class="vc-tags">${tags}</div>` : ''}
       <div class="vc-footer">
         <div class="vc-date">${v.date||''}</div>
@@ -741,7 +741,7 @@ function renderDetail() {
   `).join('');
   document.getElementById('detailBody').innerHTML = `
     <div class="detail-ref">${escHtml(v.ref)} <span style="font-size:12px;font-weight:400;color:var(--accent-deep)">${escHtml(v.version||'개역개정')}</span></div>
-    ${v.text ? `<div class="detail-verse-text">"${escHtml(v.text)}"</div>` : ''}
+    ${v.text ? `<div class="detail-verse-text">"${escHtml(v.text).replace(/\n/g,'<br>')}"</div>` : ''}
     <div style="margin-bottom:8px">
       <div class="vc-tags" style="padding:0">${(v.tags||[]).map(t=>`<span class="tag ${t}">${TAG_EMOJI[t]||''} ${t}</span>`).join('')}</div>
     </div>
