@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BIBLING">
+<meta name="theme-color" content="#F7F4EF">
+<title>BIBLING</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Square+Neo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* ── CSS 변수 ─────────────────────────────────────────── */
+:root {
+  --accent:     #A2BECE;   /* PANTONE 14-4311 TCX */
+  --accent-mid: #8AAFC0;
+  --accent-deep:#6B96AB;
+  --accent-bg:  #EAF2F7;
+  --bg:         #F7F4EF;
+  --surface:    #FFFFFF;
+  --surface2:   #F2EFE9;
+  --border:     #E2DDD6;
+  --border-mid: #CCC7BF;
+  --text:       #2C2924;
+  --text-mid:   #7A746C;
+  --text-light: #B0A99F;
+  --tag-read:   #D4E8D4;
+  --tag-study:  #D4DCF0;
+  --tag-medi:   #F0EAD4;
+  --tag-pray:   #F0D4DC;
+  --tag-memo:   #E2D4F0;
+  --tag-spirit: #D4F0EC;
+  --tag-memo2:  #F0E4D4;
+  --rs: 12px;
+  --rs-lg: 16px;
+  --shadow: 0 2px 12px rgba(44,41,36,.07);
+  --shadow-md: 0 4px 24px rgba(44,41,36,.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* ── 레이아웃 ─────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; height: 100vh; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; background: var(--bg); }
+
+/* ── 헤더 ─────────────────────────────────────────────── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; }
+.brand {
+  font-family: 'Nanum Square Neo', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 6px;
+  color: var(--text);
+}
+.brand span { color: var(--accent-deep); }
+.header-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; letter-spacing: 0.5px; }
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  border: none; border-radius: 50%;
+  background: var(--surface2);
+  color: var(--text-mid);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background .15s;
+}
+.icon-btn:hover { background: var(--border); }
+.icon-btn.accent { background: var(--accent); color: white; }
+
+/* ── 탭 바 ────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.tab-btn {
+  padding: 10px 14px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  font-family: 'Pretendard', sans-serif;
+  white-space: nowrap;
+}
+.tab-btn.active { color: var(--accent-deep); border-bottom-color: var(--accent-deep); }
+
+/* ── 스크롤 영역 ──────────────────────────────────────── */
+.scroll-area { flex: 1; overflow-y: auto; padding: 16px; }
+.scroll-area::-webkit-scrollbar { width: 3px; }
+.scroll-area::-webkit-scrollbar-track { background: transparent; }
+.scroll-area::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+/* ── 빈 상태 ──────────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 60px 20px; text-align: center;
+}
+.empty-icon { font-size: 48px; opacity: .5; }
+.empty-title { font-size: 16px; font-weight: 700; color: var(--text-mid); }
+.empty-sub { font-size: 13px; color: var(--text-light); line-height: 1.6; }
+
+/* ── 구절 카드 ────────────────────────────────────────── */
+.verse-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rs-lg);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.verse-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+
+.vc-header {
+  padding: 14px 16px 10px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+.vc-ref {
+  font-family: 'Nanum Square Neo', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+}
+.vc-ver {
+  font-size: 10px; font-weight: 700;
+  color: var(--accent-deep);
+  background: var(--accent-bg);
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.vc-text {
+  padding: 0 16px 12px;
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.7;
+  font-style: italic;
+}
+.vc-tags { display: flex; gap: 5px; padding: 0 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.tag {
+  font-size: 10px; font-weight: 700;
+  border-radius: 20px;
+  padding: 3px 9px;
+  display: flex; align-items: center; gap: 3px;
+}
+.tag.읽음   { background: var(--tag-read);   color: #3A7A3A; }
+.tag.연구   { background: var(--tag-study);  color: #3A4A8A; }
+.tag.묵상   { background: var(--tag-medi);   color: #8A7A2A; }
+.tag.기도   { background: var(--tag-pray);   color: #8A2A4A; }
+.tag.암송   { background: var(--tag-memo);   color: #5A2A8A; }
+.tag.깨달음 { background: var(--tag-spirit); color: #1A7A6A; }
+.tag.메모   { background: var(--tag-memo2);  color: #7A4A1A; }
+
+.vc-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.vc-date { font-size: 11px; color: var(--text-light); }
+.vc-note-count { font-size: 11px; color: var(--accent-deep); font-weight: 600; }
+
+/* ── FAB ──────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 24px; right: calc(50% - 240px + 20px);
+  width: 52px; height: 52px;
+  background: var(--accent-deep);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(107,150,171,.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s, box-shadow .15s;
+  z-index: 100;
+}
+.fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(107,150,171,.5); }
+@media (max-width: 480px) { .fab { right: 20px; } }
+
+/* ── 모달 오버레이 ─────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(44,41,36,.45);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── 바텀 시트 ────────────────────────────────────────── */
+.sheet {
+  width: 100%; max-width: 480px;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  max-height: 92vh;
+  display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .26s cubic-bezier(.32,0,.67,0);
+}
+.overlay.open .sheet { transform: translateY(0); transition-timing-function: cubic-bezier(.33,1,.68,1); }
+.sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+.sheet-header { padding: 14px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sheet-title { font-family: 'Nanum Square Neo', sans-serif; font-weight: 800; font-size: 17px; }
+.sheet-sub { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+.sheet-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+
+/* ── 폼 ───────────────────────────────────────────────── */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 700; color: var(--text-mid); margin-bottom: 6px; display: block; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'Pretendard', sans-serif;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { resize: none; line-height: 1.6; min-height: 90px; }
+.form-row { display: flex; gap: 8px; }
+.form-row .form-group { flex: 1; }
+
+/* ── 태그 선택기 ──────────────────────────────────────── */
+.tag-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-opt {
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  color: var(--text-mid);
+  background: var(--surface2);
+  transition: all .15s;
+}
+.tag-opt.sel { border-color: var(--accent-deep); background: var(--accent-bg); color: var(--accent-deep); }
+
+/* ── 버튼 ─────────────────────────────────────────────── */
+.btn { padding: 13px 20px; border-radius: var(--rs); font-size: 14px; font-weight: 700; border: none; cursor: pointer; font-family: 'Pretendard', sans-serif; transition: opacity .15s; }
+.btn:active { opacity: .8; }
+.btn-ghost { background: var(--surface2); color: var(--text-mid); }
+.btn-primary { background: var(--accent-deep); color: white; flex: 1; }
+.btn-danger { background: #FDE8E8; color: #C0392B; }
+
+/* ── 노트 아이템 (상세 내부) ──────────────────────────── */
+.note-item {
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 14px;
+  margin-bottom: 10px;
+  background: var(--surface);
+  position: relative;
+}
+.note-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.note-tag-label { font-size: 11px; font-weight: 700; }
+.note-date { font-size: 11px; color: var(--text-light); }
+.note-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+.note-actions { display: flex; gap: 6px; margin-top: 10px; }
+.note-act-btn { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-mid); cursor: pointer; font-family: 'Pretendard', sans-serif; }
+.note-act-btn:hover { background: var(--border); }
+
+/* ── 상세 모달 내 구절 헤더 ───────────────────────────── */
+.detail-ref {
+  font-family: 'Nanum Square Neo', sans-serif;
+  font-weight: 900;
+  font-size: 19px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.detail-verse-text {
+  font-size: 13px;
+  color: var(--text-mid);
+  font-style: italic;
+  line-height: 1.7;
+  background: var(--surface2);
+  border-radius: var(--rs);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  
+}
+.detail-section-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.add-note-btn {
+  font-size: 11px; font-weight: 700;
+  color: var(--accent-deep);
+  background: var(--accent-bg);
+  border: none; border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* ── 백업 화면 ────────────────────────────────────────── */
+.backup-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rs-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.backup-card-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.backup-card-sub { font-size: 12px; color: var(--text-light); line-height: 1.6; margin-bottom: 14px; }
+.backup-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--rs);
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.backup-btn:hover { background: var(--border); }
+.backup-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+.backup-btn.primary:hover { background: var(--accent-mid); }
+.restore-msg {
+  background: var(--surface2);
+  border-radius: var(--rs);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-top: 10px;
+  white-space: pre-line;
+}
+
+/* ── 검색바 ───────────────────────────────────────────── */
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+}
+.search-bar input {
+  flex: 1; border: none; background: none; outline: none;
+  font-size: 13px; font-family: 'Pretendard', sans-serif;
+  color: var(--text);
+}
+.search-bar input::placeholder { color: var(--text-light); }
+.search-icon { color: var(--text-light); font-size: 14px; }
+
+/* ── 정렬/필터 바 ─────────────────────────────────────── */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  white-space: nowrap;
+  font-size: 11px; font-weight: 700;
+  border-radius: 20px;
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-chip.active { background: var(--accent-deep); color: white; border-color: var(--accent-deep); }
+
+/* ── 통계 카드 ────────────────────────────────────────── */
+.stats-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.stat-card {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rs-lg);
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-num { font-family: 'Nanum Square Neo', sans-serif; font-weight: 900; font-size: 24px; color: var(--accent-deep); }
+.stat-label { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+
+/* ── 오늘의 말씀 (하단 고정) ─────────────────────────── */
+.daily-word {
+  background: var(--accent-bg);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.daily-word-label { font-size: 10px; font-weight: 700; color: var(--accent-deep); letter-spacing: 0.5px; margin-bottom: 5px; }
+.daily-word-text { font-size: 12px; color: var(--text-mid); line-height: 1.6; font-style: italic; }
+.daily-word-ref { font-size: 11px; font-weight: 700; color: var(--accent-deep); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="brand">BIBL<span>ING</span></div>
+        <div class="header-sub">나의 말씀 노트</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openBackup()" title="백업/복원">💾</button>
+        <button class="icon-btn accent" onclick="openAddSheet()" title="구절 추가">＋</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('list', this)">📖 구절 목록</button>
+    <button class="tab-btn" onclick="setTab('stats', this)">📊 통계</button>
+    <button class="tab-btn" onclick="setTab('memo', this)">✍️ 묵상 메모</button>
+  </div>
+
+  <!-- ── 구절 목록 탭 ── -->
+  <div id="tab-list" class="scroll-area" style="display:block">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="구절, 본문, 메모 검색..." oninput="renderList()" id="searchInput">
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <div class="filter-chip active" onclick="setFilter('전체', this)">전체</div>
+      <div class="filter-chip" onclick="setFilter('읽음', this)">읽음</div>
+      <div class="filter-chip" onclick="setFilter('연구', this)">연구</div>
+      <div class="filter-chip" onclick="setFilter('묵상', this)">묵상</div>
+      <div class="filter-chip" onclick="setFilter('기도', this)">기도</div>
+      <div class="filter-chip" onclick="setFilter('암송', this)">암송</div>
+      <div class="filter-chip" onclick="setFilter('깨달음', this)">깨달음</div>
+    </div>
+    <div id="verseList"></div>
+  </div>
+
+  <!-- ── 통계 탭 ── -->
+  <div id="tab-stats" class="scroll-area" style="display:none">
+    <div id="statsContent"></div>
+  </div>
+
+  <!-- ── 묵상 메모 탭 ── -->
+  <div id="tab-memo" class="scroll-area" style="display:none">
+    <div id="memoContent"></div>
+  </div>
+
+  <!-- 오늘의 말씀 -->
+  <div class="daily-word" id="dailyWord"></div>
+</div>
+
+<!-- ── FAB (모바일) ── -->
+<button class="fab" onclick="openAddSheet()">✦</button>
+
+<!-- ── 구절 추가/편집 시트 ── -->
+<div class="overlay" id="addOverlay" onclick="closeIfBg(event, 'addOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="addSheetTitle">새 구절 기록</div>
+      <div class="sheet-sub">발견한 말씀을 기록하세요</div>
+    </div>
+    <div class="sheet-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">성경 범위 / 구절</label>
+          <input class="form-input" id="fRef" placeholder="예) 요한복음 3:16" />
+        </div>
+        <div class="form-group" style="max-width:110px">
+          <label class="form-label">번역본</label>
+          <select class="form-select" id="fVer">
+            <option>개역개정</option>
+            <option>개역한글</option>
+            <option>새번역</option>
+            <option>공동번역</option>
+            <option>쉬운성경</option>
+            <option>우리말성경</option>
+            <option>새한글성경</option>
+            <option>바른성경</option>
+            <option>메시지성경</option>
+            <option>KJV</option>
+            <option>NIV</option>
+            <option>ESV</option>
+            <option>NASB</option>
+            <option>NLT</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">본문 (선택)</label>
+        <textarea class="form-textarea" id="fText" placeholder="해당 구절 본문을 붙여넣으세요..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">읽은 날짜</label>
+        <input class="form-input" id="fDate" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">활동 태그</label>
+        <div class="tag-picker" id="tagPicker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">첫 번째 메모 / 느낀 점</label>
+        <textarea class="form-textarea" id="fNote" placeholder="느낀 점이나 깨달음을 적어보세요..."></textarea>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-ghost" onclick="closeSheet('addOverlay')">취소</button>
+      <button class="btn btn-primary" onclick="saveVerse()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 구절 상세 시트 ── -->
+<div class="overlay" id="detailOverlay" onclick="closeIfBg(event, 'detailOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">구절 상세</div>
+      <div class="sheet-sub">기록 & 연구 노트</div>
+    </div>
+    <div class="sheet-body" id="detailBody"></div>
+    <div class="sheet-footer">
+      <button class="btn btn-danger" onclick="deleteCurrentVerse()">삭제</button>
+      <button class="btn btn-ghost" onclick="editCurrentVerse()">편집</button>
+      <button class="btn btn-primary" onclick="closeSheet('detailOverlay')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 노트 추가 시트 ── -->
+<div class="overlay" id="noteOverlay" onclick="closeIfBg(event, 'noteOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="noteSheetTitle">기록 추가</div>
+      <div class="sheet-sub">연구, 묵상, 기도, 깨달음을 추가하세요</div>
+    </div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">유형</label>
+        <div class="tag-picker" id="noteTagPicker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">내용</label>
+        <textarea class="form-textarea" id="nText" style="min-height:140px" placeholder=""></textarea>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-ghost" onclick="closeSheet('noteOverlay')">취소</button>
+      <button class="btn btn-primary" onclick="saveNote()">추가하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 질문 추가 시트 ── -->
+<div class="overlay" id="questionOverlay" onclick="closeIfBg(event, 'questionOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="questionSheetTitle">질문 기록</div>
+      <div class="sheet-sub">말씀을 읽으며 생긴 궁금한 점을 적어두세요</div>
+    </div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">질문 내용</label>
+        <textarea class="form-textarea" id="qText" style="min-height:160px" placeholder="이 구절에서 궁금한 점, 더 연구하고 싶은 것..."></textarea>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-ghost" onclick="closeSheet('questionOverlay')">취소</button>
+      <button class="btn btn-primary" onclick="saveQuestion()">추가하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 백업 시트 ── -->
+<div class="overlay" id="backupOverlay" onclick="closeIfBg(event, 'backupOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">💾 백업 & 복원</div>
+      <div class="sheet-sub">데이터를 안전하게 보관하세요</div>
+    </div>
+    <div class="sheet-body" id="backupBody"></div>
+    <div class="sheet-footer">
+      <button class="btn btn-primary" onclick="closeSheet('backupOverlay')" style="flex:1">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 상수 ─────────────────────────────────────────────────────── */
+const TAGS = ['읽음','연구','묵상','기도','암송','깨달음','메모'];
+const TAG_EMOJI = { 읽음:'📖', 연구:'🔍', 묵상:'🤍', 기도:'🙏', 암송:'✨', 깨달음:'💡', 메모:'📝' };
+const STORAGE_KEY = 'biblitory_v1';
+
+/* ── 상태 ─────────────────────────────────────────────────────── */
+let state = { verses: [] };
+let currentVerseId = null;
+let currentFilter = '전체';
+let editingNoteIndex = null;
+let editingNoteVerseId = null;
+
+/* ── 저장/로드 ────────────────────────────────────────────────── */
+function load() {
+  try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { verses: [] }; }
+  catch { state = { verses: [] }; }
+  if (!state.verses) state.verses = [];
+}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+/* ── 탭 전환 ──────────────────────────────────────────────────── */
+function setTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['list','stats','memo'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = (t===name)?'block':'none';
+  });
+  if (name==='stats') renderStats();
+  if (name==='memo') renderMemo();
+}
+
+/* ── 필터 ─────────────────────────────────────────────────────── */
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+/* ── 구절 목록 렌더 ───────────────────────────────────────────── */
+function renderList() {
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  let verses = state.verses;
+  if (currentFilter !== '전체') {
+    verses = verses.filter(v => v.tags && v.tags.includes(currentFilter));
+  }
+  if (q) {
+    verses = verses.filter(v =>
+      v.ref.toLowerCase().includes(q) ||
+      (v.text||'').toLowerCase().includes(q) ||
+      (v.notes||[]).some(n => n.text.toLowerCase().includes(q))
+    );
+  }
+  const el = document.getElementById('verseList');
+  if (!verses.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">기록된 구절이 없어요</div>
+      <div class="empty-sub">말씀을 읽다 마음에 새겨진 구절을<br>+ 버튼으로 기록해보세요</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = verses.slice().reverse().map(v => {
+    const noteCount = (v.notes||[]).length;
+    const tags = (v.tags||[]).map(t =>
+      `<span class="tag ${t}">${TAG_EMOJI[t]||''} ${t}</span>`).join('');
+    return `<div class="verse-card" onclick="openDetail('${v.id}')">
+      <div class="vc-header">
+        <div class="vc-ref">${escHtml(v.ref)}</div>
+        <div class="vc-ver">${escHtml(v.version||'개역개정')}</div>
+      </div>
+      ${v.text ? `<div class="vc-text">"${escHtml(v.text.slice(0,80))}${v.text.length>80?'…':''}"</div>` : ''}
+      ${tags ? `<div class="vc-tags">${tags}</div>` : ''}
+      <div class="vc-footer">
+        <div class="vc-date">${v.date||''}</div>
+        <div class="vc-note-count">${noteCount > 0 ? `📝 ${noteCount}` : ''}${(v.questions||[]).length > 0 ? ` ❓ ${(v.questions||[]).length}` : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 상세 열기 ────────────────────────────────────────────────── */
+function openDetail(id) {
+  currentVerseId = id;
+  renderDetail();
+  openSheet('detailOverlay');
+}
+function renderDetail() {
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  if (!v) return;
+  const notes = v.notes||[];
+  const notesHtml = notes.map((n, i) => `
+    <div class="note-item">
+      <div class="note-item-header">
+        <span class="note-tag-label tag ${n.tag}" style="font-size:11px">${TAG_EMOJI[n.tag]||''} ${n.tag}</span>
+        <span class="note-date">${n.date||''}</span>
+      </div>
+      <div class="note-text">${escHtml(n.text).replace(/\n/g,'<br>')}</div>
+      <div class="note-actions">
+        <button class="note-act-btn" onclick="editNote(${i})">편집</button>
+        <button class="note-act-btn" onclick="deleteNote(${i})">삭제</button>
+      </div>
+    </div>
+  `).join('');
+  const questions = v.questions||[];
+  const questionsHtml = questions.map((q, i) => `
+    <div class="note-item" style="border-left:2px solid #E8C97A">
+      <div class="note-item-header">
+        <span style="font-size:11px;font-weight:700;color:#8A6A1A">❓ 질문</span>
+        <span class="note-date">${q.date||''}</span>
+      </div>
+      <div class="note-text">${escHtml(q.text).replace(/\n/g,'<br>')}</div>
+      <div class="note-actions">
+        <button class="note-act-btn" onclick="editQuestion(${i})">편집</button>
+        <button class="note-act-btn" onclick="deleteQuestion(${i})">삭제</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-ref">${escHtml(v.ref)} <span style="font-size:12px;font-weight:400;color:var(--accent-deep)">${escHtml(v.version||'개역개정')}</span></div>
+    ${v.text ? `<div class="detail-verse-text">"${escHtml(v.text)}"</div>` : ''}
+    <div style="margin-bottom:8px">
+      <div class="vc-tags" style="padding:0">${(v.tags||[]).map(t=>`<span class="tag ${t}">${TAG_EMOJI[t]||''} ${t}</span>`).join('')}</div>
+    </div>
+    <div style="font-size:12px;color:var(--text-light);margin-bottom:16px">처음 기록: ${v.date||''}</div>
+    <div class="detail-section-title">
+      <span>📝 기록 & 연구 노트 (${notes.length}개)</span>
+      <button class="add-note-btn" onclick="openNoteSheet()">＋ 추가</button>
+    </div>
+    ${notesHtml || `<div style="text-align:center;padding:20px 0;color:var(--text-light);font-size:13px">아직 기록이 없어요</div>`}
+    <div class="detail-section-title" style="margin-top:20px">
+      <span>❓ 궁금한 점 (${questions.length}개)</span>
+      <button class="add-note-btn" style="background:#FDF3D4;color:#8A6A1A" onclick="openQuestionSheet()">＋ 추가</button>
+    </div>
+    ${questionsHtml || `<div style="text-align:center;padding:20px 0;color:var(--text-light);font-size:13px">궁금한 점을 기록해두세요</div>`}
+  `;
+}
+
+/* ── 구절 추가/저장 ───────────────────────────────────────────── */
+function openAddSheet(editId) {
+  const isEdit = !!editId;
+  document.getElementById('addSheetTitle').textContent = isEdit ? '구절 편집' : '새 구절 기록';
+  buildTagPicker('tagPicker', TAGS, isEdit ? (state.verses.find(v=>v.id===editId)?.tags||[]) : []);
+  if (isEdit) {
+    const v = state.verses.find(x=>x.id===editId);
+    document.getElementById('fRef').value = v.ref||'';
+    document.getElementById('fVer').value = v.version||'개역개정';
+    document.getElementById('fText').value = v.text||'';
+    document.getElementById('fDate').value = v.date||todayStr();
+    document.getElementById('fNote').value = '';
+    document.getElementById('addOverlay').dataset.editId = editId;
+  } else {
+    document.getElementById('fRef').value = '';
+    document.getElementById('fVer').value = '개역개정';
+    document.getElementById('fText').value = '';
+    document.getElementById('fDate').value = todayStr();
+    document.getElementById('fNote').value = '';
+    delete document.getElementById('addOverlay').dataset.editId;
+  }
+  openSheet('addOverlay');
+}
+function saveVerse() {
+  const ref = document.getElementById('fRef').value.trim();
+  if (!ref) { alert('구절을 입력해주세요.'); return; }
+  const editId = document.getElementById('addOverlay').dataset.editId;
+  const tags = getSelectedTags('tagPicker');
+  const noteText = document.getElementById('fNote').value.trim();
+  if (editId) {
+    const v = state.verses.find(x=>x.id===editId);
+    if (v) {
+      v.ref = ref;
+      v.version = document.getElementById('fVer').value;
+      v.text = document.getElementById('fText').value.trim();
+      v.date = document.getElementById('fDate').value;
+      v.tags = tags;
+    }
+  } else {
+    const v = {
+      id: Date.now().toString(),
+      ref, version: document.getElementById('fVer').value,
+      text: document.getElementById('fText').value.trim(),
+      date: document.getElementById('fDate').value,
+      tags,
+      notes: []
+    };
+    if (noteText) {
+      v.notes.push({ tag: tags[0]||'메모', text: noteText, date: todayStr() });
+    }
+    state.verses.push(v);
+  }
+  save(); renderList(); closeSheet('addOverlay');
+}
+
+/* ── 구절 삭제/편집 ───────────────────────────────────────────── */
+function deleteCurrentVerse() {
+  if (!confirm('이 구절과 모든 기록을 삭제할까요?')) return;
+  state.verses = state.verses.filter(v=>v.id!==currentVerseId);
+  save(); renderList(); closeSheet('detailOverlay');
+}
+function editCurrentVerse() {
+  closeSheet('detailOverlay');
+  setTimeout(() => openAddSheet(currentVerseId), 300);
+}
+
+/* ── 노트 시트 ────────────────────────────────────────────────── */
+function openNoteSheet(noteIdx) {
+  editingNoteIndex = (noteIdx !== undefined) ? noteIdx : null;
+  editingNoteVerseId = currentVerseId;
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  const existing = (noteIdx !== undefined) ? v.notes[noteIdx] : null;
+  document.getElementById('noteSheetTitle').textContent = existing ? '기록 편집' : '기록 추가';
+  buildTagPicker('noteTagPicker', ['연구','묵상','기도','암송','깨달음','메모'], existing ? [existing.tag] : []);
+  document.getElementById('nText').value = existing ? existing.text : '';
+  openSheet('noteOverlay');
+}
+function saveNote() {
+  const text = document.getElementById('nText').value.trim();
+  if (!text) { alert('내용을 입력해주세요.'); return; }
+  const tag = getSelectedTags('noteTagPicker')[0] || '메모';
+  const v = state.verses.find(x=>x.id===editingNoteVerseId);
+  if (!v) return;
+  if (editingNoteIndex !== null) {
+    v.notes[editingNoteIndex] = { ...v.notes[editingNoteIndex], tag, text, date: todayStr() };
+  } else {
+    if (!v.notes) v.notes = [];
+    v.notes.push({ tag, text, date: todayStr() });
+    // 태그도 자동 추가
+    if (!v.tags.includes(tag)) v.tags.push(tag);
+  }
+  save(); closeSheet('noteOverlay');
+  setTimeout(() => { openDetail(editingNoteVerseId); }, 300);
+}
+function editNote(i) {
+  closeSheet('detailOverlay');
+  setTimeout(() => { openNoteSheet(i); }, 300);
+}
+function deleteNote(i) {
+  if (!confirm('이 기록을 삭제할까요?')) return;
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  v.notes.splice(i, 1);
+  save(); renderDetail();
+}
+
+/* ── 질문 기록 ────────────────────────────────────────────────── */
+let editingQuestionIndex = null;
+
+function openQuestionSheet(qIdx) {
+  editingQuestionIndex = (qIdx !== undefined) ? qIdx : null;
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  const existing = (qIdx !== undefined) ? (v.questions||[])[qIdx] : null;
+  document.getElementById('questionSheetTitle').textContent = existing ? '질문 편집' : '질문 기록';
+  document.getElementById('qText').value = existing ? existing.text : '';
+  openSheet('questionOverlay');
+}
+function saveQuestion() {
+  const text = document.getElementById('qText').value.trim();
+  if (!text) { alert('질문 내용을 입력해주세요.'); return; }
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  if (!v.questions) v.questions = [];
+  if (editingQuestionIndex !== null) {
+    v.questions[editingQuestionIndex] = { text, date: todayStr() };
+  } else {
+    v.questions.push({ text, date: todayStr() });
+  }
+  save(); closeSheet('questionOverlay');
+  setTimeout(() => renderDetail(), 50);
+}
+function editQuestion(i) {
+  openQuestionSheet(i);
+}
+function deleteQuestion(i) {
+  if (!confirm('이 질문을 삭제할까요?')) return;
+  const v = state.verses.find(x=>x.id===currentVerseId);
+  v.questions.splice(i, 1);
+  save(); renderDetail();
+}
+
+/* ── 통계 ─────────────────────────────────────────────────────── */
+function renderStats() {
+  const el = document.getElementById('statsContent');
+  const total = state.verses.length;
+  const noteTotal = state.verses.reduce((a,v)=>a+(v.notes||[]).length,0);
+  const tagCounts = {};
+  TAGS.forEach(t => tagCounts[t] = 0);
+  state.verses.forEach(v => (v.tags||[]).forEach(t => { if (tagCounts[t]!==undefined) tagCounts[t]++; }));
+  el.innerHTML = `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">수집 구절</div></div>
+      <div class="stat-card"><div class="stat-num">${noteTotal}</div><div class="stat-label">기록 노트</div></div>
+      <div class="stat-card"><div class="stat-num">${tagCounts['암송']||0}</div><div class="stat-label">암송 구절</div></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs-lg);padding:18px;margin-bottom:12px">
+      <div class="detail-section-title" style="margin-bottom:14px"><span>활동별 현황</span></div>
+      ${TAGS.map(t => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="width:60px;font-size:12px;font-weight:700;color:var(--text-mid)">${TAG_EMOJI[t]} ${t}</span>
+          <div style="flex:1;background:var(--surface2);border-radius:4px;height:8px;overflow:hidden">
+            <div style="height:100%;background:var(--accent);border-radius:4px;width:${total?Math.round((tagCounts[t]/total)*100):0}%;transition:width .4s"></div>
+          </div>
+          <span style="font-size:12px;color:var(--text-light);width:20px;text-align:right">${tagCounts[t]}</span>
+        </div>`).join('')}
+    </div>
+    ${total===0?`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">아직 기록이 없어요</div></div>`:''}
+  `;
+}
+
+/* ── 묵상 메모 탭 ─────────────────────────────────────────────── */
+function renderMemo() {
+  const el = document.getElementById('memoContent');
+  const notes = [];
+  state.verses.forEach(v => {
+    (v.notes||[]).forEach(n => {
+      if (['묵상','기도','깨달음'].includes(n.tag)) {
+        notes.push({ ...n, ref: v.ref });
+      }
+    });
+  });
+  if (!notes.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🤍</div><div class="empty-title">묵상 기록이 없어요</div><div class="empty-sub">구절에 묵상, 기도, 깨달음을 추가하면<br>여기서 모아볼 수 있어요</div></div>`;
+    return;
+  }
+  el.innerHTML = notes.slice().reverse().map(n => `
+    <div class="note-item" style="margin-bottom:12px">
+      <div class="note-item-header">
+        <span class="tag ${n.tag}" style="font-size:11px">${TAG_EMOJI[n.tag]} ${n.tag}</span>
+        <span class="note-date">${n.date||''}</span>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--accent-deep);margin-bottom:6px">📖 ${escHtml(n.ref)}</div>
+      <div class="note-text">${escHtml(n.text).replace(/\n/g,'<br>')}</div>
+    </div>
+  `).join('');
+}
+
+/* ── 백업 ─────────────────────────────────────────────────────── */
+function openBackup() {
+  renderBackup();
+  openSheet('backupOverlay');
+}
+function renderBackup() {
+  const el = document.getElementById('backupBody');
+  el.innerHTML = `
+    <div class="backup-card">
+      <div class="backup-card-title">📤 데이터 내보내기</div>
+      <div class="backup-card-sub">현재 저장된 ${state.verses.length}개 구절과 모든 기록을 JSON 파일로 내보냅니다.</div>
+      <button class="backup-btn primary" onclick="downloadBackup()">📥 JSON 파일로 다운로드</button>
+      <button class="backup-btn" onclick="copyBackup()">📋 클립보드에 복사</button>
+    </div>
+    <div class="backup-card">
+      <div class="backup-card-title">📂 데이터 복원</div>
+      <div class="backup-card-sub">이전에 백업한 JSON 파일을 선택하면 데이터가 복원됩니다.<br><strong>⚠️ 현재 데이터가 모두 교체됩니다.</strong></div>
+      <button class="backup-btn" onclick="document.getElementById('restoreInput').click()">📁 백업 파일 선택</button>
+      <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="handleRestoreFile(event)">
+      <div id="restoreMsg"></div>
+    </div>
+  `;
+}
+function makeBackup() {
+  return JSON.stringify({ version:1, exportedAt: new Date().toISOString(), ...state }, null, 2);
+}
+function downloadBackup() {
+  const blob = new Blob([makeBackup()], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `biblitory_backup_${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function copyBackup() {
+  navigator.clipboard.writeText(makeBackup()).then(() => {
+    alert('클립보드에 복사됐어요!');
+  });
+}
+function handleRestoreFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (!parsed.verses) throw new Error('형식 오류');
+      const msg = document.getElementById('restoreMsg');
+      msg.innerHTML = `<div class="restore-msg">📦 구절 ${parsed.verses.length}개 발견됨\n내보낸 날짜: ${(parsed.exportedAt||'').slice(0,10)}\n\n<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="confirmRestore(${JSON.stringify(JSON.stringify(parsed))})">복원 시작하기</button></div>`;
+    } catch { document.getElementById('restoreMsg').innerHTML = '<div class="restore-msg" style="color:#C0392B">❌ 올바른 Biblitory 백업 파일이 아닙니다.</div>'; }
+  };
+  reader.readAsText(file);
+}
+function confirmRestore(jsonStr) {
+  if (!confirm('현재 데이터가 모두 교체됩니다. 복원할까요?')) return;
+  const parsed = JSON.parse(jsonStr);
+  state = { verses: parsed.verses };
+  save(); renderList(); closeSheet('backupOverlay');
+  alert('✅ 복원 완료!');
+}
+
+/* ── 오늘의 말씀 ──────────────────────────────────────────────── */
+const DAILY_VERSES = [
+  { kor: '주님은 나의 목자시니 내게 부족함이 없으리로다', nasb: 'The Lord is my shepherd, I lack nothing.', ref: '시편 23:1' },
+  { kor: '내가 주께 범죄하지 아니하려 하여 주의 말씀을 내 마음에 두었나이다', nasb: 'I have hidden your word in my heart that I might not sin against you.', ref: '시편 119:11' },
+  { kor: '너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라', nasb: 'Trust in the Lord with all your heart and do not lean on your own understanding.', ref: '잠언 3:5' },
+  { kor: '하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니', nasb: 'For God so loved the world, that He gave His only Son.', ref: '요한복음 3:16' },
+  { kor: '내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라', nasb: 'I can do all things through Him who strengthens me.', ref: '빌립보서 4:13' },
+  { kor: '여호와는 나의 빛이요 나의 구원이시니 내가 누구를 두려워하리요', nasb: 'The Lord is my light and my salvation; whom shall I fear?', ref: '시편 27:1' },
+  { kor: '나를 부르라 내가 네게 응답하겠고 네가 알지 못하는 크고 비밀한 일을 네게 보이리라', nasb: 'Call to Me and I will answer you, and I will tell you great and mighty things.', ref: '예레미야 33:3' },
+  { kor: '여호와는 네 우편에서 네 그늘이 되시나니', nasb: 'The Lord is your shade on your right hand.', ref: '시편 121:5' },
+  { kor: '이것이 내 계명이니 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라', nasb: 'This is My commandment, that you love one another, just as I have loved you.', ref: '요한복음 15:12' },
+  { kor: '평강의 하나님이 친히 너희를 온전히 거룩하게 하시고', nasb: 'Now may the God of peace Himself sanctify you entirely.', ref: '데살로니가전서 5:23' },
+];
+function renderDailyWord() {
+  const idx = Math.floor(Date.now() / 86400000) % DAILY_VERSES.length;
+  const v = DAILY_VERSES[idx];
+  document.getElementById('dailyWord').innerHTML = `
+    <div class="daily-word-label">✦ 오늘의 말씀</div>
+    <div class="daily-word-text">${v.kor}</div>
+    <div class="daily-word-text" style="font-size:11px;margin-top:3px;color:var(--text-light)">${v.nasb}</div>
+    <div class="daily-word-ref">${v.ref}</div>
+  `;
+}
+
+/* ── 유틸 ─────────────────────────────────────────────────────── */
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function escHtml(s='') {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function buildTagPicker(containerId, tags, selected=[]) {
+  document.getElementById(containerId).innerHTML = tags.map(t =>
+    `<div class="tag-opt ${selected.includes(t)?'sel':''}" onclick="toggleTag(this,'${containerId}')">${TAG_EMOJI[t]||''} ${t}</div>`
+  ).join('');
+}
+function toggleTag(el, containerId) {
+  // 주태그 픽커는 다중선택, 노트 태그는 단일선택
+  if (containerId === 'noteTagPicker') {
+    document.querySelectorAll(`#${containerId} .tag-opt`).forEach(e => e.classList.remove('sel'));
+  }
+  el.classList.toggle('sel');
+}
+function getSelectedTags(containerId) {
+  return [...document.querySelectorAll(`#${containerId} .tag-opt.sel`)].map(e => e.textContent.trim().replace(/^[^ ]+ /,''));
+}
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+function closeIfBg(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+
+/* ── 초기화 ───────────────────────────────────────────────────── */
+load();
+renderList();
+renderDailyWord();
+</script>
+</body>
+</html>
