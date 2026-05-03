@@ -42,13 +42,12 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+html { height: 100%; background: #F7F4EF; }
+body { height: 100%; background: #F7F4EF; overscroll-behavior: none; }
 body {
   font-family: 'Pretendard', sans-serif;
-  background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
 }
 
 /* ── 레이아웃 ─────────────────────────────────────────── */
@@ -165,7 +164,6 @@ body {
   font-size: 13px;
   color: var(--text-mid);
   line-height: 1.7;
-  font-style: italic;
 }
 .vc-tags { display: flex; gap: 5px; padding: 0 16px; flex-wrap: wrap; margin-bottom: 10px; }
 .tag {
@@ -307,13 +305,11 @@ body {
 .detail-verse-text {
   font-size: 13px;
   color: var(--text-mid);
-  font-style: italic;
   line-height: 1.7;
   background: var(--surface2);
   border-radius: var(--rs);
   padding: 12px 14px;
   margin-bottom: 16px;
-  
 }
 .detail-section-title {
   font-size: 12px; font-weight: 700;
@@ -420,12 +416,14 @@ body {
 .daily-word {
   background: var(--accent-bg);
   border-top: 1px solid var(--border);
-  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px 12px;
   flex-shrink: 0;
 }
 .daily-word-label { font-size: 10px; font-weight: 700; color: var(--accent-deep); letter-spacing: 0.5px; margin-bottom: 5px; }
-.daily-word-text { font-size: 12px; color: var(--text-mid); line-height: 1.6; font-style: italic; }
+.daily-word-text { font-size: 12px; color: var(--text-mid); line-height: 1.6; }
 .daily-word-ref { font-size: 11px; font-weight: 700; color: var(--accent-deep); margin-top: 4px; }
+.daily-word-credit { display: none; }
 </style>
 </head>
 <body>
@@ -479,6 +477,8 @@ body {
 
   <!-- 오늘의 말씀 -->
   <div class="daily-word" id="dailyWord"></div>
+  <!-- 크레딧 -->
+  <div style="background:#F7F4EF;flex-shrink:0;text-align:center;font-size:10px;color:var(--text-light);letter-spacing:0.3px;padding-top:10px;padding-bottom:max(20px,env(safe-area-inset-bottom))">@bible_grace</div>
 </div>
 
 <!-- ── FAB (모바일) ── -->
@@ -1017,25 +1017,90 @@ function confirmRestore(jsonStr) {
 
 /* ── 오늘의 말씀 ──────────────────────────────────────────────── */
 const DAILY_VERSES = [
-  { kor: '주님은 나의 목자시니 내게 부족함이 없으리로다', nasb: 'The Lord is my shepherd, I lack nothing.', ref: '시편 23:1' },
-  { kor: '내가 주께 범죄하지 아니하려 하여 주의 말씀을 내 마음에 두었나이다', nasb: 'I have hidden your word in my heart that I might not sin against you.', ref: '시편 119:11' },
-  { kor: '너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라', nasb: 'Trust in the Lord with all your heart and do not lean on your own understanding.', ref: '잠언 3:5' },
-  { kor: '하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니', nasb: 'For God so loved the world, that He gave His only Son.', ref: '요한복음 3:16' },
-  { kor: '내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라', nasb: 'I can do all things through Him who strengthens me.', ref: '빌립보서 4:13' },
-  { kor: '여호와는 나의 빛이요 나의 구원이시니 내가 누구를 두려워하리요', nasb: 'The Lord is my light and my salvation; whom shall I fear?', ref: '시편 27:1' },
-  { kor: '나를 부르라 내가 네게 응답하겠고 네가 알지 못하는 크고 비밀한 일을 네게 보이리라', nasb: 'Call to Me and I will answer you, and I will tell you great and mighty things.', ref: '예레미야 33:3' },
-  { kor: '여호와는 네 우편에서 네 그늘이 되시나니', nasb: 'The Lord is your shade on your right hand.', ref: '시편 121:5' },
-  { kor: '이것이 내 계명이니 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라', nasb: 'This is My commandment, that you love one another, just as I have loved you.', ref: '요한복음 15:12' },
-  { kor: '평강의 하나님이 친히 너희를 온전히 거룩하게 하시고', nasb: 'Now may the God of peace Himself sanctify you entirely.', ref: '데살로니가전서 5:23' },
+  {
+    kor: '여호와는 나의 목자시니 내게 부족함이 없으리로다',
+    nasb: 'The Lord is my shepherd, I shall not want.',
+    ref: '시편 23:1', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '내가 주께 범죄하지 아니하려 하여 주의 말씀을 내 마음에 두었나이다',
+    nasb: 'Your word I have treasured in my heart, that I may not sin against You.',
+    ref: '시편 119:11', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라',
+    nasb: 'Trust in the Lord with all your heart and do not lean on your own understanding.',
+    ref: '잠언 3:5', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라',
+    nasb: 'For God so loved the world, that He gave His only Son, so that everyone who believes in Him will not perish, but have eternal life.',
+    ref: '요한복음 3:16', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라',
+    nasb: 'I can do all things through Him who strengthens me.',
+    ref: '빌립보서 4:13', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '여호와는 나의 빛이요 나의 구원이시니 내가 누구를 두려워하리요 여호와는 내 생명의 능력이시니 내가 누구를 무서워하리요',
+    nasb: 'The Lord is my light and my salvation; whom shall I fear? The Lord is the defense of my life; whom shall I dread?',
+    ref: '시편 27:1', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '너는 내게 부르짖으라 내가 네게 응답하겠고 네가 알지 못하는 크고 은밀한 일을 네게 보이리라',
+    nasb: 'Call to Me and I will answer you, and I will tell you great and mighty things, which you do not know.',
+    ref: '예레미야 33:3', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '여호와는 너를 지키시는 이시라 여호와께서 네 오른쪽에서 네 그늘이 되시나니',
+    nasb: 'The Lord is your keeper; the Lord is your shade on your right hand.',
+    ref: '시편 121:5', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '내 계명은 곧 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 하는 이것이니라',
+    nasb: 'This is My commandment, that you love one another, just as I have loved you.',
+    ref: '요한복음 15:12', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '평강의 하나님이 친히 너희를 온전히 거룩하게 하시고 또 너희의 온 영과 혼과 몸이 우리 주 예수 그리스도께서 강림하실 때에 흠 없게 보전되기를 원하노라',
+    nasb: 'Now may the God of peace Himself sanctify you entirely; and may your spirit and soul and body be kept complete, blameless at the coming of our Lord Jesus Christ.',
+    ref: '데살로니가전서 5:23', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리가 날개치며 올라감 같을 것이요 달음박질하여도 곤비하지 아니하겠고 걸어가도 피곤하지 아니하리로다',
+    nasb: 'Yet those who wait for the Lord will gain new strength; they will mount up with wings like eagles, they will run and not get tired, they will walk and not become weary.',
+    ref: '이사야 40:31', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '항상 기뻐하라 쉬지 말고 기도하라 범사에 감사하라 이것이 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라',
+    nasb: 'Rejoice always; pray without ceasing; in everything give thanks; for this is God\'s will for you in Christ Jesus.',
+    ref: '데살로니가전서 5:16-18', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '내가 확신하노니 사망이나 생명이나 천사들이나 권세자들이나 현재 일이나 장래 일이나 능력이나 높음이나 깊음이나 다른 어떤 피조물이라도 우리를 우리 주 그리스도 예수 안에 있는 하나님의 사랑에서 끊을 수 없으리라',
+    nasb: 'For I am convinced that neither death, nor life, nor angels, nor principalities, nor things present, nor things to come, nor powers, nor height, nor depth, nor any other created thing will be able to separate us from the love of God that is in Christ Jesus our Lord.',
+    ref: '로마서 8:38-39', korVer: '개역개정', nasbVer: 'NASB'
+  },
+  {
+    kor: '아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라',
+    nasb: 'Be anxious for nothing, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all comprehension, will guard your hearts and your minds in Christ Jesus.',
+    ref: '빌립보서 4:6-7', korVer: '개역개정', nasbVer: 'NASB'
+  },
 ];
 function renderDailyWord() {
   const idx = Math.floor(Date.now() / 86400000) % DAILY_VERSES.length;
   const v = DAILY_VERSES[idx];
   document.getElementById('dailyWord').innerHTML = `
-    <div class="daily-word-label">✦ 오늘의 말씀</div>
-    <div class="daily-word-text">${v.kor}</div>
-    <div class="daily-word-text" style="font-size:11px;margin-top:3px;color:var(--text-light)">${v.nasb}</div>
-    <div class="daily-word-ref">${v.ref}</div>
+    <div style="margin-bottom:10px">
+      <span class="daily-word-label" style="margin-bottom:0">✦ 오늘의 말씀</span>
+      <span style="margin:0 6px;font-size:10px;color:var(--text-light)">-</span>
+      <span style="font-size:10px;color:var(--text-mid);font-weight:400;letter-spacing:0.3px">${v.ref}</span>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--accent-deep);letter-spacing:0.3px;margin-bottom:4px">${v.korVer}</div>
+    <div class="daily-word-text" style="margin-bottom:10px">${v.kor}</div>
+    <div style="font-size:10px;font-weight:800;color:var(--accent-deep);letter-spacing:0.3px;margin-bottom:4px">${v.nasbVer}</div>
+    <div class="daily-word-text" style="font-size:11px;color:#8A8178">${v.nasb}</div>
   `;
 }
 
