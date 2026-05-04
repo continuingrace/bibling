@@ -1135,6 +1135,20 @@ function closeIfBg(e, id) { if (e.target === document.getElementById(id)) closeS
 load();
 renderList();
 renderDailyWord();
+
+// iOS 사파리 붙여넣기 버그 방지: 모든 textarea를 plain text만 받게
+document.addEventListener('paste', function(e) {
+  const target = e.target;
+  if (target.tagName !== 'TEXTAREA') return;
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+  const start = target.selectionStart;
+  const end = target.selectionEnd;
+  const current = target.value;
+  target.value = current.slice(0, start) + text + current.slice(end);
+  target.selectionStart = target.selectionEnd = start + text.length;
+  target.dispatchEvent(new Event('input'));
+});
 </script>
 </body>
 </html>
