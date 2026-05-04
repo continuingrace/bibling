@@ -1278,18 +1278,21 @@ function handleRestoreFile(e) {
     try {
       const parsed = JSON.parse(ev.target.result);
       if (!parsed.verses) throw new Error('형식 오류');
+      window._restoreData = parsed;
       const msg = document.getElementById('restoreMsg');
-      msg.innerHTML = `<div class="restore-msg">📦 구절 ${parsed.verses.length}개 발견됨\n내보낸 날짜: ${(parsed.exportedAt||'').slice(0,10)}\n\n<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="confirmRestore(${JSON.stringify(JSON.stringify(parsed))})">복원 시작하기</button></div>`;
-    } catch { document.getElementById('restoreMsg').innerHTML = '<div class="restore-msg" style="color:#C0392B">❌ 올바른 Biblitory 백업 파일이 아닙니다.</div>'; }
+      msg.innerHTML = `<div class="restore-msg">📦 구절 ${parsed.verses.length}개 발견됨\n내보낸 날짜: ${(parsed.exportedAt||'').slice(0,10)}\n\n<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="confirmRestore()">복원 시작하기</button></div>`;
+    } catch { document.getElementById('restoreMsg').innerHTML = '<div class="restore-msg" style="color:#C0392B">❌ 올바른 Bibling 백업 파일이 아닙니다.</div>'; }
   };
   reader.readAsText(file);
 }
-function confirmRestore(jsonStr) {
+function confirmRestore() {
+  const parsed = window._restoreData;
+  if (!parsed) return;
   if (!confirm('현재 데이터가 모두 교체됩니다. 복원할까요?')) return;
-  const parsed = JSON.parse(jsonStr);
   state = { verses: parsed.verses };
   save(); renderList(); closeSheet('backupOverlay');
   alert('✅ 복원 완료!');
+  window._restoreData = null;
 }
 
 /* ── 성경 읽기표 ──────────────────────────────────────────────── */
