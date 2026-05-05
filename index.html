@@ -437,7 +437,6 @@ body {
 .daily-word {
   background: var(--accent-bg);
   border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
   padding: 12px 20px 12px;
   flex-shrink: 0;
 }
@@ -572,6 +571,9 @@ body {
 
   <!-- 오늘의 말씀 -->
   <div class="daily-word" id="dailyWord"></div>
+  <div style="background:var(--accent-bg);border-top:1px dashed var(--border-mid);border-bottom:1px solid var(--border);text-align:center;flex-shrink:0">
+    <button onclick="toggleDailyWord()" id="dailyWordToggleBtn" style="border:none;background:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--text-light);padding:4px 12px;font-family:'Pretendard',sans-serif;letter-spacing:0.3px">접기 ∧</button>
+  </div>
   <!-- 크레딧 -->
   <div style="background:#F7F4EF;flex-shrink:0;text-align:center;font-size:10px;color:var(--text-light);letter-spacing:0.3px;padding-top:10px;padding-bottom:max(20px,env(safe-area-inset-bottom))">@bible_grace</div>
 </div>
@@ -1573,13 +1575,12 @@ function renderDailyWord() {
   const v = DAILY_VERSES[idx];
   document.getElementById('dailyWord').innerHTML = `
     <div style="margin-bottom:10px">
-      <span class="daily-word-label" style="margin-bottom:0">✦ 오늘의 말씀</span>
-      <span style="margin:0 6px;font-size:10px;color:var(--text-light)">-</span>
-      <span style="font-size:10px;color:var(--text-mid);font-weight:400;letter-spacing:0.3px">${v.ref}</span>
+      <span class="daily-word-label" style="margin-bottom:0">✦ 오늘의 말씀 ✦</span>
+      <span style="margin-left:5px;font-size:10px;color:var(--text-mid);font-weight:400;letter-spacing:0.3px">${v.ref}</span>
     </div>
-    <div style="font-size:10px;font-weight:800;color:var(--accent-deep);letter-spacing:0.3px;margin-bottom:4px">${v.korVer}</div>
+    <div style="font-size:10px;font-weight:800;color:var(--text-mid);letter-spacing:0.3px;margin-bottom:4px">${v.korVer}</div>
     <div class="daily-word-text" style="margin-bottom:10px">${v.kor}</div>
-    <div style="font-size:10px;font-weight:800;color:var(--accent-deep);letter-spacing:0.3px;margin-bottom:4px">${v.nasbVer}</div>
+    <div style="font-size:10px;font-weight:800;color:#8A8178;letter-spacing:0.3px;margin-bottom:4px">${v.nasbVer}</div>
     <div class="daily-word-text" style="font-size:11px;color:#8A8178">${v.nasb}</div>
   `;
 }
@@ -1610,6 +1611,13 @@ function getSelectedTags(containerId) {
 function openSheet(id) { document.getElementById(id).classList.add('open'); }
 function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
 function closeIfBg(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+
+let dailyWordOpen = true;
+function toggleDailyWord() {
+  dailyWordOpen = !dailyWordOpen;
+  document.getElementById('dailyWord').style.display = dailyWordOpen ? 'block' : 'none';
+  document.getElementById('dailyWordToggleBtn').textContent = dailyWordOpen ? '접기 ∧' : '오늘의 말씀 ∨';
+}
 
 /* ── 초기화 ───────────────────────────────────────────────────── */
 load();
